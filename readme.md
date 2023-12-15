@@ -29,6 +29,3 @@ npm run build
 ### Installing to chrome
 Navigate to `chrome://extentions`  
 Press the `Load unpacked` button and select the `./dist` folder  
-
-Install the extention to `chrome://extentions`  
-Press the `Load unpacked` button and select the `./dist` folder  
