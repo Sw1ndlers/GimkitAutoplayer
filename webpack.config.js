@@ -1,5 +1,6 @@
 const path = require("path")
 const CopyPlugin = require("copy-webpack-plugin")
+const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = {
     entry: "./src/index.ts",
@@ -28,5 +29,8 @@ module.exports = {
         new CopyPlugin({
             patterns: [{ from: "extention", to: "./" }],
         }),
+        new WebpackObfuscator ({
+            rotateStringArray: true
+        })
     ],
 }
