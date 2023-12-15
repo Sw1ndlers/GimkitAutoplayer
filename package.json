@@ -1,8 +1,8 @@
 {
     "scripts": {
-        "build": "webpack --mode production",
-        "start": "webpack serve --progress --color",
-        "watchdev": "webpack --mode development --watch --progress --color",
+        "build": "webpack --mode production --env=production --progress --color",
+        "builddev": "webpack --mode development --env=development --progress --color",
+        "watch": "webpack --mode development --env=development --watch --progress --color",
         "format": "npx prettier . --write"
     },
     "devDependencies": {
