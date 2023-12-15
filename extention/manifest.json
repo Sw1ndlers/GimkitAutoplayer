@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Gimkit Autosolver",
+    "author": "Alex L",
+    "description": "Testing",
+    "version": "1.0",
+    "action": {
+        "default_popup": "static/html/index.html",
+        "default_icon": "static/icons/cat.png"
+    },
+    "content_scripts": [
+        {
+            "world": "MAIN",
+            "js": ["index.js"],
+            "run_at": "document_start",
+            "matches": ["https://www.gimkit.com/join*"]
+        }
+    ]
+}
