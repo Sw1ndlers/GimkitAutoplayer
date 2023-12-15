@@ -5,7 +5,7 @@
     "description": "Show / Highlight correct answers on Gimkit.",
     "version": "1.0",
     "action": {
-        "default_icon": "static/icons/icon.png"
+        "default_icon": "static/icon.png"
     },
     "content_scripts": [
         {
@@ -16,6 +16,6 @@
         }
     ],
     "icons": {
-        "128": "static/icons/icon.png"
+        "128": "static/icon.png"
     }
 }
