@@ -9,7 +9,7 @@ import { isCode } from "@functions/codes"
     We can use this function to split the actual content from the encoded string.
     
     Example of encoded string:
-        ..."�gameId�65786a52907381002b1ba47a��...
+        "...�gameId�65786a52907381002b1ba47a��..."
     Example of output:
         [..., "gameId", "65786a52907381002b1ba47a", ...]
 */

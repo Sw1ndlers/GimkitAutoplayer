@@ -3,8 +3,8 @@ import { GameCode } from "@root/types"
 const possiblePreviousValues: string[] = ["id", "game"]
 
 /*
-    The reason for previous value is that the game code is 
-    usually preceded by one of the values in `possiblePreviousValues`.
+    The reason for previous value is that the game code is usually preceded
+    by one of the values in `possiblePreviousValues` inside the decoded split.
 */
 
 function isPossibleCode(code: GameCode, previousValue: string): boolean {
