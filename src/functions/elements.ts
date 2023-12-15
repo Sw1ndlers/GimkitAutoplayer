@@ -1,4 +1,3 @@
-
 export function getElementByXpath(path: string): HTMLElement {
     return document.evaluate(
         path,

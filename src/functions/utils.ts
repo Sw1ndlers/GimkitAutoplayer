@@ -19,7 +19,10 @@ export async function getGameQuestions(code: GameCode) {
     return json.kit.questions as Question[]
 }
 
-export function getTextWidth(element: HTMLParagraphElement, text: string): number {
+export function getTextWidth(
+    element: HTMLParagraphElement,
+    text: string
+): number {
     const tempElement = document.createElement("div")
     tempElement.setAttribute(
         "style",

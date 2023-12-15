@@ -2,7 +2,6 @@ import { getElement, getElementByText, getParent } from "@functions/elements"
 import { getTextWidth, includesExactly } from "@functions/utils"
 import { Question } from "@root/types"
 
-
 function createTextOverlay(answerBox: HTMLElement, answer: string) {
     let answerBoxRect = answerBox.getBoundingClientRect()
     let anserBoxWidth = answerBoxRect.width
@@ -56,12 +55,12 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
 function highlightMCAnswer(answerBox: HTMLElement) {
     let answersContainer = getParent(answerBox, 7)
     let choiceBoxes = answersContainer.children
-    
+
     console.log(answerBox)
     console.log(answersContainer)
 
     for (let i = 0; i < choiceBoxes.length; i++) {
-    let choiceBox = choiceBoxes[i].children[0] as HTMLElement // Child 1 contains the background color
+        let choiceBox = choiceBoxes[i].children[0] as HTMLElement // Child 1 contains the background color
 
         if (choiceBox.textContent != answerBox.textContent) {
             choiceBox.setAttribute("style", "background-color: #808080")
@@ -134,12 +133,11 @@ export class Answerer {
 
         return true
     }
-    
+
     private getCorrectAnswerBox(correctAnswer: string): HTMLElement {
         // Will return answer <p> if it has the same text as the correct answer
         return getElementByText("span", correctAnswer)
     }
-
 
     public async answerCurrentQuestion() {
         let questionElement = this.getCurrentQuestion()
@@ -153,7 +151,6 @@ export class Answerer {
             createTextOverlay(this.getAnswerBox(), answer.trim())
         } else if (question.type == "mc") {
             console.log("Answering multiple choice question")
-
 
             let correctBox = this.getCorrectAnswerBox(answer)
             highlightMCAnswer(correctBox)

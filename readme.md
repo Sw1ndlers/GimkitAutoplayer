@@ -3,11 +3,13 @@
 ## Building
 
 Install Dependencies
+
 ```sh
 npm i
 ```
 
 Build the extention to `./dist`
+
 ```sh
 npm run build
 ```
