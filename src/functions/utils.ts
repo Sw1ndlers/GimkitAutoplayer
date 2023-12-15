@@ -19,20 +19,31 @@ export async function getGameQuestions(code: GameCode) {
     return json.kit.questions as Question[]
 }
 
-export function getElementByXpath(path: string): HTMLElement {
-    return document.evaluate(
-        path,
-        document,
-        null,
-        XPathResult.FIRST_ORDERED_NODE_TYPE,
-        null
-    ).singleNodeValue as HTMLElement
+export function getTextWidth(element: HTMLParagraphElement, text: string): number {
+    const tempElement = document.createElement("div")
+    tempElement.setAttribute(
+        "style",
+        `
+        display: inline-block;
+        visibility: hidden;
+        font-size: ${getComputedStyle(element).fontSize};
+        font-family: ${getComputedStyle(element).fontFamily};
+        font-weight: ${getComputedStyle(element).fontWeight};
+        font-style: ${getComputedStyle(element).fontStyle};
+    `
+    )
+
+    tempElement.textContent = text
+    document.body.appendChild(tempElement)
+
+    const width = tempElement.getBoundingClientRect().width
+
+    document.body.removeChild(tempElement)
+    return width
 }
 
-export function getElement(tag: string, attribute: string, value: string) {
-    return getElementByXpath(`//${tag}[@${attribute}="${value}"]`)
-}
-
-export function getElementByText(tag: string, text: string) {
-    return getElement(tag, "text()", text)
+// Checks if a string is at the start of another string
+export function includesExactly(mainString: string, searchString: string) {
+    const index = mainString.toLowerCase().indexOf(searchString.toLowerCase())
+    return index !== -1 && index === 0
 }

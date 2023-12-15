@@ -1,34 +1,7 @@
-import { getElement, getElementByText } from "@functions/utils"
+import { getElement, getElementByText, getParent } from "@functions/elements"
+import { getTextWidth, includesExactly } from "@functions/utils"
 import { Question } from "@root/types"
 
-// Checks if a string is at the start of another string
-function includesExactly(mainString: string, searchString: string) {
-    const index = mainString.toLowerCase().indexOf(searchString.toLowerCase())
-    return index !== -1 && index === 0
-}
-
-function getTextWidth(element: HTMLParagraphElement, text: string): number {
-    const tempElement = document.createElement("div")
-    tempElement.setAttribute(
-        "style",
-        `
-        display: inline-block;
-        visibility: hidden;
-        font-size: ${getComputedStyle(element).fontSize};
-        font-family: ${getComputedStyle(element).fontFamily};
-        font-weight: ${getComputedStyle(element).fontWeight};
-        font-style: ${getComputedStyle(element).fontStyle};
-    `
-    )
-
-    tempElement.textContent = text
-    document.body.appendChild(tempElement)
-
-    const width = tempElement.getBoundingClientRect().width
-
-    document.body.removeChild(tempElement)
-    return width
-}
 
 function createTextOverlay(answerBox: HTMLElement, answer: string) {
     let answerBoxRect = answerBox.getBoundingClientRect()
@@ -80,6 +53,22 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
     answerBox.parentElement.insertBefore(overlay, answerBox)
 }
 
+function highlightMCAnswer(answerBox: HTMLElement) {
+    let answersContainer = getParent(answerBox, 7)
+    let choiceBoxes = answersContainer.children
+    
+    console.log(answerBox)
+    console.log(answersContainer)
+
+    for (let i = 0; i < choiceBoxes.length; i++) {
+    let choiceBox = choiceBoxes[i].children[0] as HTMLElement // Child 1 contains the background color
+
+        if (choiceBox.textContent != answerBox.textContent) {
+            choiceBox.setAttribute("style", "background-color: #808080")
+        }
+    }
+}
+
 export class Answerer {
     private questionList: Question[]
 
@@ -87,8 +76,8 @@ export class Answerer {
         this.questionList = questionList
     }
 
-    private getCurrentQuestion(): string {
-        return document.querySelector(".notranslate").textContent
+    private getCurrentQuestion(): HTMLElement {
+        return document.querySelector(".notranslate")
     }
 
     private getAnswerBox(): HTMLElement {
@@ -145,16 +134,29 @@ export class Answerer {
 
         return true
     }
+    
+    private getCorrectAnswerBox(correctAnswer: string): HTMLElement {
+        // Will return answer <p> if it has the same text as the correct answer
+        return getElementByText("span", correctAnswer)
+    }
+
 
     public async answerCurrentQuestion() {
-        let questionText = this.getCurrentQuestion()
+        let questionElement = this.getCurrentQuestion()
+        let questionText = questionElement.textContent
 
         let question = this.getQuestion(questionText)
         let answer = this.getQuestionAnswer(question)
 
         if (question.type == "text") {
             console.log("Answering text question")
-            createTextOverlay(this.getAnswerBox(), answer)
+            createTextOverlay(this.getAnswerBox(), answer.trim())
+        } else if (question.type == "mc") {
+            console.log("Answering multiple choice question")
+
+
+            let correctBox = this.getCorrectAnswerBox(answer)
+            highlightMCAnswer(correctBox)
         }
     }
 }
