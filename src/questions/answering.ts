@@ -2,6 +2,17 @@ import { getElement, getElementByText, getParent } from "@functions/elements"
 import { getTextWidth, includesExactly } from "@functions/utils"
 import { Question } from "@root/types"
 
+function replaceAtStart(input: string, toReplace: string, replaceWith: string) {
+    const esc = toReplace.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+    const reg = new RegExp("^" + esc, "i")
+
+    if (reg.test(input)) {
+        return input.replace(reg, replaceWith)
+    }
+
+    return input
+}
+
 function createTextOverlay(answerBox: HTMLElement, answer: string) {
     let answerBoxRect = answerBox.getBoundingClientRect()
     let anserBoxWidth = answerBoxRect.width
@@ -37,9 +48,7 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
         let currentText = input.value
 
         if (includesExactly(answer, currentText)) {
-            let newText = answer
-                .toLowerCase()
-                .replace(currentText.toLowerCase(), "")
+            let newText = replaceAtStart(answer, currentText, "")
             let oldTextWidth = getTextWidth(overlay, currentText)
 
             overlay.style.transform = `translate(${oldTextWidth}px, 1.3px)`
@@ -52,17 +61,14 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
     answerBox.parentElement.insertBefore(overlay, answerBox)
 }
 
-function highlightMCAnswer(answerBox: HTMLElement) {
+function highlightMCAnswer(answerBox: HTMLElement, answer: string) {
     let answersContainer = getParent(answerBox, 7)
     let choiceBoxes = answersContainer.children
-
-    console.log(answerBox)
-    console.log(answersContainer)
 
     for (let i = 0; i < choiceBoxes.length; i++) {
         let choiceBox = choiceBoxes[i].children[0] as HTMLElement // Child 1 contains the background color
 
-        if (choiceBox.textContent != answerBox.textContent) {
+        if (choiceBox.textContent != answer) {
             choiceBox.setAttribute("style", "background-color: #808080")
         }
     }
@@ -153,7 +159,7 @@ export class Answerer {
             console.log("Answering multiple choice question")
 
             let correctBox = this.getCorrectAnswerBox(answer)
-            highlightMCAnswer(correctBox)
+            highlightMCAnswer(correctBox, answer.trim())
         }
     }
 }
