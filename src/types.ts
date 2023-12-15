@@ -2,6 +2,7 @@ export type DecodedMessage = string
 export type GameCode = string
 
 /*
+    Example Question:
     {
         "type": "text"
         "position": 0,
@@ -21,6 +22,11 @@ export type GameCode = string
     }
 */
 
+export enum QuestionType {
+    Text = "text",
+    MultipleChoice = "mc",
+}
+
 type Answer = {
     correct: boolean
     text: string
@@ -28,7 +34,7 @@ type Answer = {
 }
 
 export type Question = {
-    type: "text"
+    type: QuestionType
     answers: Answer[]
     position: number
     isActive: boolean

@@ -1,6 +1,6 @@
 import { getElement, getElementByText, getParent } from "@functions/elements"
 import { getTextWidth, includesExactly } from "@functions/utils"
-import { Question } from "@root/types"
+import { Question, QuestionType } from "@root/types"
 
 function replaceAtStart(input: string, toReplace: string, replaceWith: string) {
     const esc = toReplace.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
@@ -81,17 +81,23 @@ export class Answerer {
         this.questionList = questionList
     }
 
-    private getCurrentQuestion(): HTMLElement {
+    private getCurrentQuestionElement(): HTMLElement | null {
         return document.querySelector(".notranslate")
     }
 
-    private getAnswerBox(): HTMLElement {
+    private getAnswerInputElement(): HTMLElement | null {
         return getElement("input", "placeholder", "Enter answer here...")
     }
 
-    private getQuestion(questionText: string): Question | undefined {
+    private getCurrentQuestionType(): QuestionType {
+        return this.getAnswerInputElement() == null
+            ? QuestionType.MultipleChoice
+            : QuestionType.Text
+    }
+
+    private getQuestionFromInfo(questionText: string, questionType: QuestionType): Question {
         let question = this.questionList.find((question) => {
-            return question.text === questionText
+            return question.text == questionText && question.type == questionType
         })
 
         return question
@@ -106,17 +112,13 @@ export class Answerer {
             return answer.correct
         })
 
-        if (correctAnswer === undefined) {
-            throw new Error(`No correct answer found for question ${question}`)
-        }
-
         return correctAnswer.text
     }
 
     private getQuestionAnswer(question: Question): string {
-        if (question.type == "text") {
+        if (question.type == QuestionType.Text) {
             return this.getTextAnswer(question)
-        } else if (question.type == "mc") {
+        } else if (question.type == QuestionType.MultipleChoice) {
             return this.getMultipleChoiceAnswer(question)
         }
 
@@ -131,7 +133,8 @@ export class Answerer {
         }
 
         // Check if the question text is in the question list
-        let questionFound = this.getQuestion(question.textContent)
+        let questionType = this.getCurrentQuestionType()
+        let questionFound = this.getQuestionFromInfo(question.textContent, questionType)
 
         if (questionFound === undefined) {
             return false
@@ -141,25 +144,28 @@ export class Answerer {
     }
 
     private getCorrectAnswerBox(correctAnswer: string): HTMLElement {
-        // Will return answer <p> if it has the same text as the correct answer
+        // BUG: Will return the question if it has the same text as the correct answer
         return getElementByText("span", correctAnswer)
     }
 
     public async answerCurrentQuestion() {
-        let questionElement = this.getCurrentQuestion()
+        let questionElement = this.getCurrentQuestionElement()
+        let questionType = this.getCurrentQuestionType()
         let questionText = questionElement.textContent
 
-        let question = this.getQuestion(questionText)
-        let answer = this.getQuestionAnswer(question)
+        let question = this.getQuestionFromInfo(questionText, questionType)
+        let answer = this.getQuestionAnswer(question).trim()
 
-        if (question.type == "text") {
+        console.log(this.getCurrentQuestionType())
+
+        if (question.type == QuestionType.Text) {
             console.log("Answering text question")
-            createTextOverlay(this.getAnswerBox(), answer.trim())
-        } else if (question.type == "mc") {
+            createTextOverlay(this.getAnswerInputElement(), answer)
+        } else if (question.type == QuestionType.MultipleChoice) {
             console.log("Answering multiple choice question")
 
             let correctBox = this.getCorrectAnswerBox(answer)
-            highlightMCAnswer(correctBox, answer.trim())
+            highlightMCAnswer(correctBox, answer)
         }
     }
 }
