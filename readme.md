@@ -14,5 +14,5 @@ Build the extention to `./dist`
 npm run build
 ```
 
-Install the extention to `chrome://extentions`
-Press the `Load unpacked` button and select the `./dist` folder
+Install the extention to `chrome://extentions`  
+Press the `Load unpacked` button and select the `./dist` folder  
