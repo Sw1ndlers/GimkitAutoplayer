@@ -2,11 +2,10 @@
     "manifest_version": 3,
     "name": "Gimkit Autosolver",
     "author": "Alex L",
-    "description": "Testing",
+    "description": "Show / Highlight correct answers on Gimkit.",
     "version": "1.0",
     "action": {
-        "default_popup": "static/html/index.html",
-        "default_icon": "static/icons/cat.png"
+        "default_icon": "static/icons/icon.png"
     },
     "content_scripts": [
         {
@@ -15,5 +14,8 @@
             "run_at": "document_start",
             "matches": ["https://www.gimkit.com/join*"]
         }
-    ]
+    ],
+    "icons": {
+        "128": "static/icons/icon.png"
+    }
 }
