@@ -27,7 +27,7 @@ export enum QuestionType {
     MultipleChoice = "mc",
 }
 
-type Answer = {
+export type Answer = {
     correct: boolean
     text: string
     _id: string
