@@ -28,7 +28,7 @@ module.exports = (env) => {
         },
         plugins: [
             new CopyPlugin({
-                patterns: [{ from: "extention", to: "./" }],
+                patterns: [{ from: "extension", to: "./" }],
             }),
             env.production &&
                 new WebpackObfuscator({
