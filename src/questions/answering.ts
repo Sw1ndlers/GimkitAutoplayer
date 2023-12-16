@@ -1,6 +1,6 @@
 import { getElement, getElementByText, getParent } from "@functions/elements"
 import { getTextWidth, includesExactly } from "@functions/utils"
-import { Question, QuestionType } from "@root/types"
+import { Question, QuestionType, Answer } from "@root/types"
 
 function replaceAtStart(input: string, toReplace: string, replaceWith: string) {
     const esc = toReplace.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
@@ -15,7 +15,7 @@ function replaceAtStart(input: string, toReplace: string, replaceWith: string) {
 
 function createTextOverlay(answerBox: HTMLElement, answer: string) {
     let answerBoxRect = answerBox.getBoundingClientRect()
-    let anserBoxWidth = answerBoxRect.width
+    let answerBoxWidth = answerBoxRect.width
     let answerBoxHeight = answerBoxRect.height
     let answerBoxClasses = answerBox.getAttribute("class")
 
@@ -34,7 +34,7 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
         pointer-events: none;
 
         color: #838383;
-        width: ${anserBoxWidth}px;
+        width: ${answerBoxWidth}px;
         height: ${answerBoxHeight}px;
         transform: translate(0px, 1.3px);
     `
@@ -61,14 +61,16 @@ function createTextOverlay(answerBox: HTMLElement, answer: string) {
     answerBox.parentElement.insertBefore(overlay, answerBox)
 }
 
-function highlightMCAnswer(answerBox: HTMLElement, answer: string) {
-    let answersContainer = getParent(answerBox, 7)
+function highlightMCAnswers(answers: string[]) {
+    let tempAnswerBox = getElementByText("span", answers[0]) // Use the get answer container
+    let answersContainer = getParent(tempAnswerBox, 7)
+
     let choiceBoxes = answersContainer.children
 
     for (let i = 0; i < choiceBoxes.length; i++) {
         let choiceBox = choiceBoxes[i].children[0] as HTMLElement // Child 1 contains the background color
 
-        if (choiceBox.textContent != answer) {
+        if (answers.includes(choiceBox.textContent) == false) {
             choiceBox.setAttribute("style", "background-color: #808080")
         }
     }
@@ -95,27 +97,38 @@ export class Answerer {
             : QuestionType.Text
     }
 
-    private getQuestionFromInfo(questionText: string, questionType: QuestionType): Question {
+    private getQuestionFromInfo(
+        questionText: string,
+        questionType: QuestionType
+    ): Question {
         let question = this.questionList.find((question) => {
-            return question.text == questionText && question.type == questionType
+            return (
+                question.text == questionText && question.type == questionType
+            )
         })
 
         return question
     }
 
-    private getTextAnswer(question: Question): string {
-        return question.answers[0].text
+    private getTextAnswer(question: Question): string[] {
+        return [question.answers[0].text]
     }
 
-    private getMultipleChoiceAnswer(question: Question): string {
-        let correctAnswer = question.answers.find((answer) => {
+    private getMultipleChoiceAnswer(question: Question): string[] {
+        // let correctAnswer = question.answers.find((answer) => {
+        //     return answer.correct
+        // })
+        let correctAnswers: Answer[] = question.answers.filter((answer) => {
             return answer.correct
         })
+        let correctTexts: string[] = correctAnswers.map((answer) => {
+            return answer.text
+        })
 
-        return correctAnswer.text
+        return correctTexts
     }
 
-    private getQuestionAnswer(question: Question): string {
+    private getQuestionAnswer(question: Question): string[] {
         if (question.type == QuestionType.Text) {
             return this.getTextAnswer(question)
         } else if (question.type == QuestionType.MultipleChoice) {
@@ -134,7 +147,10 @@ export class Answerer {
 
         // Check if the question text is in the question list
         let questionType = this.getCurrentQuestionType()
-        let questionFound = this.getQuestionFromInfo(question.textContent, questionType)
+        let questionFound = this.getQuestionFromInfo(
+            question.textContent,
+            questionType
+        )
 
         if (questionFound === undefined) {
             return false
@@ -143,29 +159,26 @@ export class Answerer {
         return true
     }
 
-    private getCorrectAnswerBox(correctAnswer: string): HTMLElement {
-        // BUG: Will return the question if it has the same text as the correct answer
-        return getElementByText("span", correctAnswer)
-    }
-
     public async answerCurrentQuestion() {
         let questionElement = this.getCurrentQuestionElement()
         let questionType = this.getCurrentQuestionType()
         let questionText = questionElement.textContent
 
         let question = this.getQuestionFromInfo(questionText, questionType)
-        let answer = this.getQuestionAnswer(question).trim()
+        let answers = this.getQuestionAnswer(question).map((answer) => {
+            return answer.trim()
+        })
 
         console.log(this.getCurrentQuestionType())
 
         if (question.type == QuestionType.Text) {
             console.log("Answering text question")
-            createTextOverlay(this.getAnswerInputElement(), answer)
+            createTextOverlay(this.getAnswerInputElement(), answers[0])
         } else if (question.type == QuestionType.MultipleChoice) {
             console.log("Answering multiple choice question")
 
-            let correctBox = this.getCorrectAnswerBox(answer)
-            highlightMCAnswer(correctBox, answer)
+            // let correctBoxes = this.getCorrectAnswerBoxes(answers)
+            highlightMCAnswers(answers)
         }
     }
 }
