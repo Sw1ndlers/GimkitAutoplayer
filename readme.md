@@ -24,7 +24,7 @@ Install Dependencies
 npm i
 ```
 
-Build the extention to `./dist`
+Build the extensions to `./dist`
 
 ```sh
 npm run build
@@ -32,5 +32,5 @@ npm run build
 
 ### Installing to chrome
 
-Navigate to `chrome://extentions`  
+Navigate to `chrome://extensions`  
 Press the `Load unpacked` button and select the `./dist` folder
