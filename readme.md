@@ -1,5 +1,7 @@
 # Gimkit Autosolver
 
+No longer works
+
 ## Installing the Extention
 
 ### Downloading
